@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getCapitalGains, getHoldings } from './api/mockApi';
 import GainsCard from './components/GainsCard';
 import HoldingsTable from './components/HoldingsTable';
@@ -7,7 +7,6 @@ import './App.css';
 function App() {
   const [holdings, setHoldings] = useState(null);
   const [capitalGainsBefore, setCapitalGainsBefore] = useState(null);
-  const [capitalGainsAfter, setCapitalGainsAfter] = useState(null);
   const [selectedHoldings, setSelectedHoldings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +21,6 @@ function App() {
         ]);
         
         setCapitalGainsBefore(gainsData);
-        setCapitalGainsAfter(gainsData);
         setHoldings(holdingsData);
       } catch (err) {
         setError('Failed to fetch data. Please try again later.');
@@ -59,11 +57,10 @@ function App() {
     return calculatedGains;
   };
 
-  useEffect(() => {
-    if (!capitalGainsBefore || !holdings) return;
+  const capitalGainsAfter = useMemo(() => {
+    if (!capitalGainsBefore || !holdings) return null;
     
-    const newGains = applyTaxHarvesting(capitalGainsBefore, selectedHoldings, holdings);
-    setCapitalGainsAfter(newGains);
+    return applyTaxHarvesting(capitalGainsBefore, selectedHoldings, holdings);
   }, [selectedHoldings, capitalGainsBefore, holdings]);
 
   const handleSelectRow = (id) => {
@@ -94,22 +91,18 @@ function App() {
     }
   };
 
-  // Calculate projected savings based on a 30% tax rate assumption
-  const calculateSavings = () => {
+  // Stage 4 Memoized savings logic
+  const projectedSavings = useMemo(() => {
     if (!capitalGainsBefore || !capitalGainsAfter) return 0;
     
     const preGains = calculateNetGains(capitalGainsBefore);
     const postGains = calculateNetGains(capitalGainsAfter);
 
-    // If total gains are reduced, calculate 30% of the reduced amount as tax saved
-    if (postGains.total < preGains.total) {
-      return (preGains.total - postGains.total) * 0.30;
-    }
+    // savings = preHarvest - postHarvest
+    const savings = preGains.total - postGains.total;
     
-    return 0;
-  };
-
-  const projectedSavings = calculateSavings();
+    return savings > 0 ? savings : 0;
+  }, [capitalGainsBefore, capitalGainsAfter]);
 
   return (
     <div className="app-container">
