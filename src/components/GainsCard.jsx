@@ -23,10 +23,10 @@ const GainsCard = ({ title, data, projectedSavings, isAfterHarvesting }) => {
         <div className="gain-row">
           <span className="gain-label">Short-Term Gains (STCG)</span>
           <div className="gain-values">
-            <span className="profit">{formatCurrency(shortTerm.profits)}</span>
-            <span className="loss"> - {formatCurrency(shortTerm.losses)}</span>
+            <span key={shortTerm.profits} className="profit value-update">{formatCurrency(shortTerm.profits)}</span>
+            <span key={shortTerm.losses} className="loss value-update"> - {formatCurrency(shortTerm.losses)}</span>
           </div>
-          <span className={`net-gain ${stcg >= 0 ? 'positive' : 'negative'}`}>
+          <span key={stcg} className={`net-gain value-update ${stcg >= 0 ? 'positive' : 'negative'}`}>
             = {formatCurrency(stcg)}
           </span>
         </div>
@@ -34,10 +34,10 @@ const GainsCard = ({ title, data, projectedSavings, isAfterHarvesting }) => {
         <div className="gain-row">
           <span className="gain-label">Long-Term Gains (LTCG)</span>
           <div className="gain-values">
-            <span className="profit">{formatCurrency(longTerm.profits)}</span>
-            <span className="loss"> - {formatCurrency(longTerm.losses)}</span>
+            <span key={longTerm.profits} className="profit value-update">{formatCurrency(longTerm.profits)}</span>
+            <span key={longTerm.losses} className="loss value-update"> - {formatCurrency(longTerm.losses)}</span>
           </div>
-          <span className={`net-gain ${ltcg >= 0 ? 'positive' : 'negative'}`}>
+          <span key={ltcg} className={`net-gain value-update ${ltcg >= 0 ? 'positive' : 'negative'}`}>
             = {formatCurrency(ltcg)}
           </span>
         </div>
@@ -47,7 +47,7 @@ const GainsCard = ({ title, data, projectedSavings, isAfterHarvesting }) => {
 
       <div className="gains-total">
         <span>Total Realised Gains</span>
-        <span className={`total-value ${totalGains >= 0 ? 'positive' : 'negative'}`}>
+        <span key={totalGains} className={`total-value value-update ${totalGains >= 0 ? 'positive' : 'negative'}`}>
           {formatCurrency(totalGains)}
         </span>
       </div>
