@@ -72,6 +72,20 @@ function App() {
     );
   };
 
+  // Calculate Net gains (Stage 2)
+  const calculateNetGains = (gainsData) => {
+    if (!gainsData) return { stcg: 0, ltcg: 0, total: 0 };
+    
+    const stcg = gainsData.shortTerm.profits - gainsData.shortTerm.losses;
+    const ltcg = gainsData.longTerm.profits - gainsData.longTerm.losses;
+    
+    return {
+      stcg,
+      ltcg,
+      total: stcg + ltcg
+    };
+  };
+
   const handleSelectAll = (e) => {
     if (e.target.checked && holdings) {
       setSelectedHoldings(holdings.map(h => h.id));
@@ -84,17 +98,12 @@ function App() {
   const calculateSavings = () => {
     if (!capitalGainsBefore || !capitalGainsAfter) return 0;
     
-    const preStcg = capitalGainsBefore.shortTerm.profits - capitalGainsBefore.shortTerm.losses;
-    const preLtcg = capitalGainsBefore.longTerm.profits - capitalGainsBefore.longTerm.losses;
-    const preTotal = preStcg + preLtcg;
-
-    const postStcg = capitalGainsAfter.shortTerm.profits - capitalGainsAfter.shortTerm.losses;
-    const postLtcg = capitalGainsAfter.longTerm.profits - capitalGainsAfter.longTerm.losses;
-    const postTotal = postStcg + postLtcg;
+    const preGains = calculateNetGains(capitalGainsBefore);
+    const postGains = calculateNetGains(capitalGainsAfter);
 
     // If total gains are reduced, calculate 30% of the reduced amount as tax saved
-    if (postTotal < preTotal) {
-      return (preTotal - postTotal) * 0.30;
+    if (postGains.total < preGains.total) {
+      return (preGains.total - postGains.total) * 0.30;
     }
     
     return 0;
