@@ -34,31 +34,35 @@ function App() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (!capitalGainsBefore || !holdings) return;
+  const applyTaxHarvesting = (baseGains, selectedHoldingIds, allHoldings) => {
+    const calculatedGains = JSON.parse(JSON.stringify(baseGains));
 
-    // Deep copy to prevent mutating the original state
-    const newGains = JSON.parse(JSON.stringify(capitalGainsBefore));
-
-    selectedHoldings.forEach(id => {
-      const holding = holdings.find(h => h.id === id);
+    selectedHoldingIds.forEach(id => {
+      const holding = allHoldings.find(h => h.id === id);
       if (holding) {
-        // Add ST gains/losses
+        // Short-Term Gain Logic
         if (holding.shortTermGain > 0) {
-          newGains.shortTerm.profits += holding.shortTermGain;
+          calculatedGains.shortTerm.profits += holding.shortTermGain;
         } else if (holding.shortTermGain < 0) {
-          newGains.shortTerm.losses += Math.abs(holding.shortTermGain);
+          calculatedGains.shortTerm.losses += Math.abs(holding.shortTermGain);
         }
 
-        // Add LT gains/losses
+        // Long-Term Gain Logic
         if (holding.longTermGain > 0) {
-          newGains.longTerm.profits += holding.longTermGain;
+          calculatedGains.longTerm.profits += holding.longTermGain;
         } else if (holding.longTermGain < 0) {
-          newGains.longTerm.losses += Math.abs(holding.longTermGain);
+          calculatedGains.longTerm.losses += Math.abs(holding.longTermGain);
         }
       }
     });
 
+    return calculatedGains;
+  };
+
+  useEffect(() => {
+    if (!capitalGainsBefore || !holdings) return;
+    
+    const newGains = applyTaxHarvesting(capitalGainsBefore, selectedHoldings, holdings);
     setCapitalGainsAfter(newGains);
   }, [selectedHoldings, capitalGainsBefore, holdings]);
 
