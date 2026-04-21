@@ -1,4 +1,4 @@
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, formatSignedCurrency } from '../utils/formatters';
 
 const GainsCard = ({ title, data, projectedSavings, isAfterHarvesting }) => {
   if (!data) {
@@ -19,42 +19,55 @@ const GainsCard = ({ title, data, projectedSavings, isAfterHarvesting }) => {
     <div className={`gains-card ${isAfterHarvesting ? 'highlight' : ''}`}>
       <h2 className="gains-title">{title}</h2>
       
-      <div className="gains-grid">
-        <div className="gain-row">
-          <span className="gain-label">Short-Term Gains (STCG)</span>
-          <div className="gain-values">
-            <span key={shortTerm.profits} className="profit value-update">{formatCurrency(shortTerm.profits)}</span>
-            <span key={shortTerm.losses} className="loss value-update"> - {formatCurrency(shortTerm.losses)}</span>
-          </div>
-          <span key={stcg} className={`net-gain value-update ${stcg >= 0 ? 'positive' : 'negative'}`}>
-            = {formatCurrency(stcg)}
-          </span>
-        </div>
-
-        <div className="gain-row">
-          <span className="gain-label">Long-Term Gains (LTCG)</span>
-          <div className="gain-values">
-            <span key={longTerm.profits} className="profit value-update">{formatCurrency(longTerm.profits)}</span>
-            <span key={longTerm.losses} className="loss value-update"> - {formatCurrency(longTerm.losses)}</span>
-          </div>
-          <span key={ltcg} className={`net-gain value-update ${ltcg >= 0 ? 'positive' : 'negative'}`}>
-            = {formatCurrency(ltcg)}
-          </span>
-        </div>
+      <div className="header-row">
+        <span></span>
+        <span className="value">Short-term</span>
+        <span className="value">Long-term</span>
       </div>
-
+      
+      <div className="row">
+        <span className="label">Profits</span>
+        <span className="value profit value-update" key={`stp-${shortTerm.profits}`}>{formatCurrency(shortTerm.profits)}</span>
+        <span className="value profit value-update" key={`ltp-${longTerm.profits}`}>{formatCurrency(longTerm.profits)}</span>
+      </div>
+      
+      <div className="row">
+        <span className="label">Losses</span>
+        <span className="value loss value-update" key={`stl-${shortTerm.losses}`}>{formatSignedCurrency(-shortTerm.losses)}</span>
+        <span className="value loss value-update" key={`ltl-${longTerm.losses}`}>{formatSignedCurrency(-longTerm.losses)}</span>
+      </div>
+      
       <div className="gains-divider"></div>
-
-      <div className="gains-total">
-        <span>Total Realised Gains</span>
-        <span key={totalGains} className={`total-value value-update ${totalGains >= 0 ? 'positive' : 'negative'}`}>
-          {formatCurrency(totalGains)}
+      
+      <div className="row net-row">
+        <span className="label">Net Capital Gains</span>
+        <span className={`value value-update ${stcg >= 0 ? 'net-positive' : 'net-negative'}`} key={`stcg-${stcg}`}>
+          {formatSignedCurrency(stcg)}
+        </span>
+        <span className={`value value-update ${ltcg >= 0 ? 'net-positive' : 'net-negative'}`} key={`ltcg-${ltcg}`}>
+          {formatSignedCurrency(ltcg)}
         </span>
       </div>
 
+      {isAfterHarvesting ? (
+        <div className="gains-total">
+          <span className="total-label">Effective Capital Gains:</span>
+          <span key={totalGains} className="total-value value-update">
+            {formatSignedCurrency(totalGains)}
+          </span>
+        </div>
+      ) : (
+        <div className="gains-total">
+          <span className="total-label">Realised Capital Gains:</span>
+          <span key={totalGains} className="total-value value-update">
+            {formatSignedCurrency(totalGains)}
+          </span>
+        </div>
+      )}
+
       {isAfterHarvesting && projectedSavings > 0 && (
         <div className="savings-badge">
-          🎉 You're going to save <strong>{formatCurrency(projectedSavings)}</strong>!
+          🎉 You are going to save upto <strong>{formatCurrency(projectedSavings)}</strong>
         </div>
       )}
     </div>
