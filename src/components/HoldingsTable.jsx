@@ -24,6 +24,16 @@ const HoldingsTable = () => {
     return <span className="sort-icon active">{sortOrder === 'asc' ? '↑' : '↓'}</span>;
   };
 
+  const sortedHoldings = useMemo(() => {
+    if (!holdings) return [];
+    if (!sortField) return holdings;
+    return [...holdings].sort((a, b) => {
+      const valA = a[sortField];
+      const valB = b[sortField];
+      return sortOrder === 'asc' ? valA - valB : valB - valA;
+    });
+  }, [holdings, sortField, sortOrder]);
+
   if (!holdings) {
     return <div className="table-skeleton">Loading holdings...</div>;
   }
@@ -33,20 +43,11 @@ const HoldingsTable = () => {
   
   const selectedCount = selectedHoldings.length;
 
-  const sortedHoldings = useMemo(() => {
-    if (!sortField) return holdings;
-    return [...holdings].sort((a, b) => {
-      const valA = a[sortField];
-      const valB = b[sortField];
-      return sortOrder === 'asc' ? valA - valB : valB - valA;
-    });
-  }, [holdings, sortField, sortOrder]);
-
   // Changed initial show count from 4 to 5 based on requirements
   const visibleHoldings = showAll ? sortedHoldings : sortedHoldings.slice(0, 4);
 
   return (
-    <div className="holdings-section">
+    <div className="card holdings-section">
       <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Actionable Holdings</h2>

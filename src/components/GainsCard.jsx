@@ -16,7 +16,7 @@ const GainsCard = ({ title, data, projectedSavings, isAfterHarvesting }) => {
   const totalGains = stcg + ltcg;
 
   return (
-    <div className={`gains-card ${isAfterHarvesting ? 'highlight' : ''}`}>
+    <div className={`card gains-card ${isAfterHarvesting ? 'highlight' : ''}`}>
       <h2 className="gains-title">{title}</h2>
       
       <div className="header-row">
